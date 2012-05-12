@@ -59,6 +59,20 @@ var Brawl = function (canvas, config) {
         c.fillRect(myPlayer.x, myPlayer.y, 10, 10);
     }
 
+    //Set the nickname as soon as the connection is ready
+    var socket = io.connect('/');
+    socket.on('connect', function(){});
+    socket.on('disconnect', function(){
+        alert("Connection closed");
+    });
 
-    window.requestAnimFrame(frame);
-};
+    //message sending function
+    var sendMessage = function(text) {
+        that.socket.emit('msg', text); 
+    };
+
+        window.requestAnimFrame(frame);
+    };
+}
+
+
