@@ -4,27 +4,28 @@ var Player = function(x,y, name){
     this.name   = name;
     this.speedX = 0;
     this.speedY = 0;
-    this.accel  = 3;
+    this.accel  = 1;
+    this.maxAcc= 2;
     this.moving = true;
     var that    = this;
 
     this.moveRight = function (){
-        that.speedX += that.accel;
+        that.speedX += Math.max(that.accel, that.maxAcc);
         that.moving = true;
     }
 
     this.moveLeft = function (){
-        that.speedX -= that.accel;
+        that.speedX -= Math.max(that.accel, that.maxAcc);
         that.moving = true;
     }
 
     this.moveUp = function (){
-        that.speedY -= that.accel;
+        that.speedY -= Math.max(that.accel, that.maxAcc);
         that.moving = true;
     }
 
     this.moveDown = function (){
-        that.speedY += that.accel;
+        that.speedY += Math.max(that.accel, that.maxAcc);
         that.moving = true;
     }
 

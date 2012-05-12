@@ -48,11 +48,13 @@ var createBrawl = function(){
     var players = {};
     var user_count = 0;
 
-    var refreshPlayers = function () {
-        room.emit('list', players);
-    };
 
-    var room = io.of('/').on('connection', function (socket) {
+    var room = io.on('connection', function (socket) {
+
+        var refreshPlayers = function () {
+            socket.broadcast.emit('list', players);
+        };
+
         //If the client doesn't set any nickname it'll remain Anonymous
         var _this = this;
 
@@ -66,7 +68,7 @@ var createBrawl = function(){
 
         //Someone presents himself
         socket.on('name', function (name) {
-            players[socket.id].name = new_name;
+            players[socket.id].name = name;
             refreshPlayers();
         });
 

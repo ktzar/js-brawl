@@ -20,10 +20,9 @@ var Brawl = function (canvas, config) {
     var c       = canvas.getContext('2d');
     var _this   = this;
 
-    var players = new Array();
+    var all_players = {};
 
     var myPlayer = new Player(20,20, "miguel");
-    players.push(myPlayer);
     c.font = "12px Verdana";
 
     //Generate particles from the current cursor position
@@ -37,6 +36,7 @@ var Brawl = function (canvas, config) {
                 )
             ) {
             eval("myPlayer.move"+e.keyIdentifier+"()");
+            return false;
         }
     });
     document.addEventListener('keyup', function(e) {
@@ -45,6 +45,7 @@ var Brawl = function (canvas, config) {
                 e.keyIdentifier == "Left" ||
                 e.keyIdentifier == "Right" ) {
             myPlayer.stop();
+            return false;
         }
     });
 
@@ -52,27 +53,36 @@ var Brawl = function (canvas, config) {
     var frame = function () {
         window.requestAnimFrame(frame);
         myPlayer.tick();
+        if ( myPlayer.moving ) {
+            socket.emit('updatePosition', {x:myPlayer.x,y:myPlayer.y}); 
+        }
         c.clearRect(0,0,width,height);
         c.fillStyle = 'rgba(0,0,0,0.75)';
 
         c.fillText(myPlayer.name, myPlayer.x, myPlayer.y);
         c.fillRect(myPlayer.x, myPlayer.y, 10, 10);
+
+        for (player in all_players) {
+            c.fillText(player.name, player.x, player.y);
+            c.fillRect(player.x, player.y, 10, 10);
+        }
     }
 
     //Set the nickname as soon as the connection is ready
     var socket = io.connect('/');
-    socket.on('connect', function(){});
+    socket.on('connect', function(){
+        socket.emit('name', myPlayer.name);
+    });
+    socket.on('list', function(players){
+        console.log('list', players);
+        all_players = players;
+    });
     socket.on('disconnect', function(){
         alert("Connection closed");
     });
 
-    //message sending function
-    var sendMessage = function(text) {
-        that.socket.emit('msg', text); 
-    };
 
-        window.requestAnimFrame(frame);
-    };
-}
+    window.requestAnimFrame(frame);
+};
 
 
