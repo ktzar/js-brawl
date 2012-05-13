@@ -4,30 +4,30 @@ var Player = function(x,y, name, stage){
     this.name   = name;
     this.speedX = 0;
     this.speedY = 0;
-    this.accel  = 1;
-    this.maxAcc= 2;
+    this.accel  = 0.4;
+    this.maxSpeed= 3;
     this.moving = false;
     var player  = this;
 
     player.color = '#'+Math.floor(Math.random()*16777215).toString(16);
 
     player.moveRight = function (){
-        player.speedX += Math.max(player.accel, player.maxAcc);
+        player.speedX = Math.min(player.speedX+player.accel, player.maxSpeed);
         player.moving = true;
     }
 
     player.moveLeft = function (){
-        player.speedX -= Math.max(player.accel, player.maxAcc);
+        player.speedX = Math.max(player.speedX-player.accel, -player.maxSpeed);
         player.moving = true;
     }
 
     player.moveUp = function (){
-        player.speedY -= Math.max(player.accel, player.maxAcc);
+        player.speedY = Math.max(player.speedY-player.accel, -player.maxSpeed);
         player.moving = true;
     }
 
     player.moveDown = function (){
-        player.speedY += Math.max(player.accel, player.maxAcc);
+        player.speedY = Math.min(player.speedY+player.accel, player.maxSpeed);
         player.moving = true;
     }
 

@@ -26,12 +26,12 @@ var Brawl = function (canvas, config) {
     stage.drawPlayer = function(player){
         size = c.measureText(player.name);
         c.fillStyle = player.color;
-        c.fillRect(player.x, player.y, size.width, 15);
+        c.fillRect(player.x-2, player.y-2, size.width+4, 19);
         c.fillStyle = 'rgba(255,255,255,1)';
         c.fillText(player.name, player.x, player.y+ 10);
     }
 
-    var myPlayer = new Player(20,20, "miguel", stage);
+    var myPlayer = new Player(20,20, prompt('Name?'), stage);
     c.font = "12px Verdana";
 
     document.addEventListener('keydown', function(e) {
@@ -62,7 +62,7 @@ var Brawl = function (canvas, config) {
         window.requestAnimFrame(frame);
         myPlayer.tick();
         if ( Math.abs(myPlayer.speedX) > 0.1 || Math.abs(myPlayer.speedY) > 0.1 ) {
-            socket.emit('updatePosition', {x:myPlayer.x,y:myPlayer.y}); 
+            socket.emit('updateInfo', myPlayer); 
         }
         c.clearRect(0,0,stage.width,stage.height);
         stage.drawPlayer(myPlayer);
