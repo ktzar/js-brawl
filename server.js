@@ -60,15 +60,9 @@ var createBrawl = function(){
 
         players[socket.id] = {x:0,y:0,name:"Loading..."};
 
-        socket.on('updatePosition', function (position) {
-            players[socket.id].x = position.x;
-            players[socket.id].y = position.y;
-            refreshPlayers();
-        });
-
-        //Someone presents himself
-        socket.on('name', function (name) {
-            players[socket.id].name = name;
+        socket.on('updateInfo', function (player) {
+            players[socket.id] = player;
+            players[socket.id] = player;
             refreshPlayers();
         });
 

@@ -1,4 +1,4 @@
-var Player = function(x,y, name){
+var Player = function(x,y, name, stage){
     this.x      = x;
     this.y      = y;
     this.name   = name;
@@ -6,39 +6,46 @@ var Player = function(x,y, name){
     this.speedY = 0;
     this.accel  = 1;
     this.maxAcc= 2;
-    this.moving = true;
-    var that    = this;
+    this.moving = false;
+    var player  = this;
 
-    this.moveRight = function (){
-        that.speedX += Math.max(that.accel, that.maxAcc);
-        that.moving = true;
+    player.color = '#'+Math.floor(Math.random()*16777215).toString(16);
+
+    player.moveRight = function (){
+        player.speedX += Math.max(player.accel, player.maxAcc);
+        player.moving = true;
     }
 
-    this.moveLeft = function (){
-        that.speedX -= Math.max(that.accel, that.maxAcc);
-        that.moving = true;
+    player.moveLeft = function (){
+        player.speedX -= Math.max(player.accel, player.maxAcc);
+        player.moving = true;
     }
 
-    this.moveUp = function (){
-        that.speedY -= Math.max(that.accel, that.maxAcc);
-        that.moving = true;
+    player.moveUp = function (){
+        player.speedY -= Math.max(player.accel, player.maxAcc);
+        player.moving = true;
     }
 
-    this.moveDown = function (){
-        that.speedY += Math.max(that.accel, that.maxAcc);
-        that.moving = true;
+    player.moveDown = function (){
+        player.speedY += Math.max(player.accel, player.maxAcc);
+        player.moving = true;
     }
 
-    this.stop = function (){
-        that.moving = false;
+    player.stop = function (){
+        player.moving = false;
     }
 
-    this.tick = function (){
-        that.x += that.speedX;
-        that.y += that.speedY;
-        if (that.moving == false) {
-            that.speedX *= 0.9;
-            that.speedY *= 0.9;
+    player.tick = function (){
+        //Don't go offlimits
+        if ( player.x < 0 && player.speedX < 0 ) player.speedX = 0;
+        if ( player.x > stage.width -30 && player.speedX > 0 ) player.speedX = 0;
+        if ( player.y < 0 && player.speedY < 0 ) player.speedY = 0;
+        if ( player.y > stage.height -30 && player.speedY > 0 ) player.speedY = 0;
+        player.x += player.speedX;
+        player.y += player.speedY;
+        if (player.moving == false) {
+            player.speedX *= 0.9;
+            player.speedY *= 0.9;
         }
     }
 }

@@ -15,17 +15,16 @@ var Brawl = function (canvas, config) {
 
     //set the canvas and load the width and height
     var canvas  = canvas;
-    var width   = canvas.getAttribute('width');
-    var height  = canvas.getAttribute('height');
     var c       = canvas.getContext('2d');
-    var _this   = this;
+    var stage   = this;
+    stage.width   = canvas.getAttribute('width');
+    stage.height  = canvas.getAttribute('height');
 
-    var all_players = {};
+    stage.all_players = {};
 
-    var myPlayer = new Player(20,20, "miguel");
+    var myPlayer = new Player(20,20, "miguel", stage);
     c.font = "12px Verdana";
 
-    //Generate particles from the current cursor position
     document.addEventListener('keydown', function(e) {
         console.log(e);
         if (    typeof e.keyIdentifier != undefined && (
@@ -53,29 +52,37 @@ var Brawl = function (canvas, config) {
     var frame = function () {
         window.requestAnimFrame(frame);
         myPlayer.tick();
-        if ( myPlayer.moving ) {
+        if ( Math.abs(myPlayer.speedX) > 0.1 || Math.abs(myPlayer.speedY) > 0.1 ) {
             socket.emit('updatePosition', {x:myPlayer.x,y:myPlayer.y}); 
         }
-        c.clearRect(0,0,width,height);
-        c.fillStyle = 'rgba(0,0,0,0.75)';
+        c.clearRect(0,0,stage.width,stage.height);
+        var size = c.measureText(myPlayer.name);
+        c.fillStyle = myPlayer.color;
+        c.fillRect(myPlayer.x, myPlayer.y, size.width, 15);
+        c.fillStyle = 'rgba(255,255,255,1)';
+        c.fillText(myPlayer.name, myPlayer.x, myPlayer.y+ 10);
+        var otherPlayer = null;
 
-        c.fillText(myPlayer.name, myPlayer.x, myPlayer.y);
-        c.fillRect(myPlayer.x, myPlayer.y, 10, 10);
-
-        for (player in all_players) {
-            c.fillText(player.name, player.x, player.y);
-            c.fillRect(player.x, player.y, 10, 10);
+        for (player in stage.all_players) {
+            otherPlayer = stage.all_players[player];
+            if ( player == socket.socket.sessionid ) {
+                continue;
+            }
+            size = c.measureText(otherPlayer.name);
+            c.fillStyle = otherPlayer.color;
+            c.fillRect(otherPlayer.x, otherPlayer.y, size.width, 15);
+            c.fillStyle = 'rgba(255,255,255,1)';
+            c.fillText(otherPlayer.name, otherPlayer.x, otherPlayer.y+ 10);
         }
     }
 
     //Set the nickname as soon as the connection is ready
     var socket = io.connect('/');
     socket.on('connect', function(){
-        socket.emit('name', myPlayer.name);
+        socket.emit('updateInfo', myPlayer); 
     });
     socket.on('list', function(players){
-        console.log('list', players);
-        all_players = players;
+        stage.all_players = players;
     });
     socket.on('disconnect', function(){
         alert("Connection closed");
