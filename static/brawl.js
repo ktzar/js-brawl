@@ -23,10 +23,16 @@ var Brawl = function (canvas, config) {
 
     stage.all_players = {};
 
-    stage.drawPlayer = function(player){
+    stage.drawPlayer = function(player, mine){
+        if ( typeof mine == "undefined" )
+            mine = false;
         size = c.measureText(player.name);
         c.fillStyle = player.color;
         c.fillRect(player.x-2, player.y-2, size.width+4, 19);
+        if (mine == true) {
+            c.fillStyle = "#000000";
+            c.strokeRect(player.x-2, player.y-2, size.width+4, 19);
+        }
         c.fillStyle = 'rgba(255,255,255,1)';
         c.fillText(player.name, player.x, player.y+ 10);
     }
@@ -34,16 +40,17 @@ var Brawl = function (canvas, config) {
     var myPlayer = new Player(20,20, prompt('Name?'), stage);
     c.font = "12px Verdana";
 
+    var keyMappings = {
+        37: "Left",
+        38: "Up",
+        39: "Right",
+        40: "Down",
+    };
+
     document.addEventListener('keydown', function(e) {
-        console.log(e);
-        if (    typeof e.keyIdentifier != undefined && (
-                    e.keyIdentifier == "Up" ||
-                    e.keyIdentifier == "Down" ||
-                    e.keyIdentifier == "Left" ||
-                    e.keyIdentifier == "Right" 
-                )
-            ) {
-            eval("myPlayer.move"+e.keyIdentifier+"()");
+        if (    typeof keyMappings[e.keyCode] != "undefined" ) {
+            var keyIdentifier = keyMappings[e.keyCode];
+            eval("myPlayer.move"+keyIdentifier+"()");
             return false;
         }
     });
@@ -65,9 +72,7 @@ var Brawl = function (canvas, config) {
             socket.emit('updateInfo', myPlayer); 
         }
         c.clearRect(0,0,stage.width,stage.height);
-        stage.drawPlayer(myPlayer);
         var otherPlayer = null;
-
         for (player in stage.all_players) {
             otherPlayer = stage.all_players[player];
             if ( player == socket.socket.sessionid ) {
@@ -75,6 +80,8 @@ var Brawl = function (canvas, config) {
             }
             stage.drawPlayer(otherPlayer);
         }
+        //Draw mine later so it's on top
+        stage.drawPlayer(myPlayer, true);
     }
 
     //Set the nickname as soon as the connection is ready

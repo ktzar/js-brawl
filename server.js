@@ -61,6 +61,13 @@ var createBrawl = function(){
         players[socket.id] = {x:0,y:0,name:"Loading..."};
 
         socket.on('updateInfo', function (player) {
+            //Information that will be shared
+            var playerInfo = {
+                x:      player.x,
+                y:      player.y,
+                name:   player.name,
+                color:  player.color
+            };
             players[socket.id] = player;
             players[socket.id] = player;
             refreshPlayers();
