@@ -17,10 +17,19 @@ var Brawl = function (canvas, config) {
     var canvas  = canvas;
     var c       = canvas.getContext('2d');
     var stage   = this;
+
     stage.width   = canvas.getAttribute('width');
     stage.height  = canvas.getAttribute('height');
 
     stage.all_players = {};
+
+    stage.drawPlayer = function(player){
+        size = c.measureText(player.name);
+        c.fillStyle = player.color;
+        c.fillRect(player.x, player.y, size.width, 15);
+        c.fillStyle = 'rgba(255,255,255,1)';
+        c.fillText(player.name, player.x, player.y+ 10);
+    }
 
     var myPlayer = new Player(20,20, "miguel", stage);
     c.font = "12px Verdana";
@@ -56,11 +65,7 @@ var Brawl = function (canvas, config) {
             socket.emit('updatePosition', {x:myPlayer.x,y:myPlayer.y}); 
         }
         c.clearRect(0,0,stage.width,stage.height);
-        var size = c.measureText(myPlayer.name);
-        c.fillStyle = myPlayer.color;
-        c.fillRect(myPlayer.x, myPlayer.y, size.width, 15);
-        c.fillStyle = 'rgba(255,255,255,1)';
-        c.fillText(myPlayer.name, myPlayer.x, myPlayer.y+ 10);
+        stage.drawPlayer(myPlayer);
         var otherPlayer = null;
 
         for (player in stage.all_players) {
@@ -68,11 +73,7 @@ var Brawl = function (canvas, config) {
             if ( player == socket.socket.sessionid ) {
                 continue;
             }
-            size = c.measureText(otherPlayer.name);
-            c.fillStyle = otherPlayer.color;
-            c.fillRect(otherPlayer.x, otherPlayer.y, size.width, 15);
-            c.fillStyle = 'rgba(255,255,255,1)';
-            c.fillText(otherPlayer.name, otherPlayer.x, otherPlayer.y+ 10);
+            stage.drawPlayer(otherPlayer);
         }
     }
 
